@@ -40,10 +40,11 @@
     .app{min-height:100vh; min-height:100svh; min-height:100dvh; max-width:min(920px, 100%);
          margin:0 auto; padding:0 clamp(8px, 4vw, 18px); position:relative; z-index:1}
     header{padding:clamp(10px, 2.2vw, 16px) 0 clamp(6px, 2vw, 10px); color:var(--muted); position:sticky; top:0; backdrop-filter:saturate(140%) blur(6px);
-      background:linear-gradient(180deg, rgba(6,16,26,.82), rgba(6,16,26,.0)); z-index:5}
+      background:linear-gradient(180deg, rgba(6,16,26,.82), rgba(6,16,26,.0)); z-index:5; display:flex; align-items:center; justify-content:space-between; gap:clamp(8px, 2vw, 16px)}
     .title{font-weight:800; letter-spacing:.18em; text-transform:uppercase; font-size:clamp(12px, 1.4vw + 8px, 17px);
       background:linear-gradient(90deg, var(--hud) 0%, #8be7ff 40%, var(--hud-2) 100%);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent}
+    .header-actions{display:flex; align-items:center; gap:clamp(8px, 2vw, 12px)}
 
     /* ===== Chat Stream ===== */
     .chat{position:relative; padding:clamp(6px, 1.2vw, 10px) 0 clamp(110px, 18vh, 150px);
@@ -67,17 +68,21 @@
     /* ===== Composer ===== */
     .composer{position:fixed; left:0; right:0; bottom:0; z-index:20; background:linear-gradient(180deg, rgba(6,16,26,.92), rgba(6,16,26,.98));
       border-top:1px solid rgba(0,229,255,.18); padding:clamp(8px, 2.5vw, 12px) clamp(8px, 3vw, 12px) calc(clamp(8px, 2.5vw, 12px) + env(safe-area-inset-bottom))}
-    .composer .inner{max-width:min(920px, 100%); margin:0 auto; display:grid; grid-template-columns: 1fr auto auto; gap:clamp(6px, 2.4vw, 10px); align-items:end; padding:0 clamp(8px, 4vw, 14px); min-width:0}
+    .composer .inner{max-width:min(920px, 100%); margin:0 auto; display:grid; grid-template-columns: 1fr auto; gap:clamp(6px, 2.4vw, 10px); align-items:end; padding:0 clamp(8px, 4vw, 14px); min-width:0}
     textarea{flex:1; min-height:22px; max-height:200px; background:#071425; color:var(--text); border:1px solid rgba(0,229,255,.22); border-radius:clamp(10px, 3vw, 14px); padding:clamp(10px, 2.2vw, 12px) clamp(12px, 3vw, 14px); resize:vertical; outline:none; box-shadow:inset 0 0 12px rgba(0,229,255,.06); font-size:16px; min-width:0}
     textarea:focus{box-shadow:inset 0 0 14px rgba(0,229,255,.16), var(--ring)}
-    .send{inline-size:clamp(64px, 22vw, 108px); height:clamp(40px, 9.5vw, 46px); border-radius:clamp(10px, 3vw, 12px); border:1px solid rgba(0,229,255,.35); background:linear-gradient(180deg,#0e1f36,#0b1728); color:#c9f3ff; font-weight:700; letter-spacing:.04em; cursor:pointer; box-shadow:var(--shadow)}
-    .send:hover{box-shadow:0 0 26px rgba(0,229,255,.28), inset 0 0 18px rgba(0,229,255,.12)}
-    .send:disabled{opacity:.55; cursor:not-allowed}
+    .icon-btn{display:grid; place-items:center; width:clamp(44px, 12vw, 54px); height:clamp(44px, 12vw, 54px); border-radius:50%; border:1px solid rgba(0,229,255,.35);
+      background:linear-gradient(180deg,#0e1f36,#0b1728); color:#c9f3ff; font-size:clamp(18px, 4vw, 22px); cursor:pointer; box-shadow:var(--shadow); transition:box-shadow .2s ease, transform .2s ease}
+    .icon-btn:hover{box-shadow:0 0 26px rgba(0,229,255,.28), inset 0 0 18px rgba(0,229,255,.12)}
+    .icon-btn:active{transform:translateY(1px)}
+    .icon-btn span{line-height:1}
+    .send{font-weight:700}
+    .send:disabled{opacity:.55; cursor:not-allowed; box-shadow:var(--shadow); transform:none}
+    .send:disabled:hover{box-shadow:var(--shadow)}
     .reset{background:linear-gradient(180deg,#10233b,#0b192a); border-color:rgba(0,229,255,.28)}
 
     /* One-column controls on tiny widths (iPhone SE down / split view) */
-    @media (max-width:360px){ .composer .inner{ grid-template-columns: 1fr; }
-      .send,.reset{width:100%}
+    @media (max-width:360px){ .composer .inner{ grid-template-columns: 1fr auto; }
     }
 
     /* iPad & iMac niceties */
@@ -109,7 +114,12 @@
   <canvas id="bgfx" class="bgfx" aria-hidden="true"></canvas>
   <div id="hudfx" class="hudfx" aria-hidden="true"></div>
   <div class="app" id="app" aria-label="TISAI Chat">
-    <header><div class="title">TISAI</div></header>
+    <header>
+      <div class="title">TISAI</div>
+      <div class="header-actions">
+        <button id="reset" class="icon-btn reset" title="Reset chat" aria-label="Reset chat"><span aria-hidden="true">↺</span></button>
+      </div>
+    </header>
     <main id="chat" class="chat" aria-live="polite"></main>
     <div id="banner" class="banner" role="alert"></div>
   </div>
@@ -117,8 +127,7 @@
   <div class="composer" role="form" aria-label="bericht versturen">
     <div class="inner">
       <textarea id="prompt" placeholder="Serienummer, Urenstand, Foutcodes, Probleem…" inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
-      <button id="send" class="send" disabled>Stuur</button>
-      <button id="reset" class="send reset" title="Reset chat" aria-label="Reset chat">Reset</button>
+      <button id="send" class="icon-btn send" disabled aria-label="Stuur bericht"><span aria-hidden="true">↑</span></button>
     </div>
   </div>
 
