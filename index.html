@@ -215,7 +215,7 @@
     const composer = document.querySelector('.composer');
 
     const ENDPOINT = 'https://node01n8n.mit.rd-n.nl/webhook/aimy-chat';
-    const INITIAL_MESSAGE = 'Om je snel te helpen heb ik vier dingen nodig:\n1) Serienummer\n2) Urenstand\n3) Foutcodes (indien bekend)\n4) Korte omschrijving van het probleem.';
+    const INITIAL_MESSAGE = 'Hallo, wat kan ik voor je doen?';
 
     function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
     function showBanner(msg){ banner.innerHTML = msg; banner.classList.add('show'); }
